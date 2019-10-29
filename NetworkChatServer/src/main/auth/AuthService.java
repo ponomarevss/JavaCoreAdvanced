@@ -1,4 +1,4 @@
-package auth;
+package main.auth;
 
 public interface AuthService {
 
