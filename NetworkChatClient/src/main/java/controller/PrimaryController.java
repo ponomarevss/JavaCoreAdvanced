@@ -74,7 +74,6 @@ public class PrimaryController implements Initializable {
 
     private void sendMessage() {
         String message = messageText.getText();
-        chatTextArea.appendText("Я: " + message + System.lineSeparator());
         messageService.sendMessage(message);
         messageText.clear();
     }

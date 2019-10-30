@@ -15,6 +15,14 @@ public class ServerMessageService implements IMessageService {
     private static final String HOST_PORT_PROP = "server.port";
     public static final String STOP_SERVER_COMMAND = "/end";
 
+//    public static String getHostAddressProp() {
+//        return HOST_ADDRESS_PROP;
+//    }
+//
+//    public static String getHostPortProp() {
+//        return HOST_PORT_PROP;
+//    }
+
     private String hostAddress;
     private int hostPort;
 
@@ -74,7 +82,7 @@ public class ServerMessageService implements IMessageService {
             alert.showAndWait();
         }
         else {
-            chatTextArea.appendText("Сервер: " + message + System.lineSeparator());
+            chatTextArea.appendText(message + System.lineSeparator());
         }
     }
 
@@ -85,4 +93,6 @@ public class ServerMessageService implements IMessageService {
         }
         network.close();
     }
+
+
 }

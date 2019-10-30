@@ -4,6 +4,7 @@ import main.MyServer;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
 
@@ -26,9 +27,9 @@ public class ClientHandler {
 
             new Thread(() -> {
                 try {
-                    authentication();
                     readMessages();
                 } catch (IOException e) {
+                    System.out.println("The connection has been interrupted");
                     e.printStackTrace();
                 } finally {
                     closeConnection();
@@ -42,11 +43,15 @@ public class ClientHandler {
     private void readMessages() throws IOException {
         while (true) {
             String clientMessage = in.readUTF();
-            System.out.printf("Message '%s' from client %s%n", clientMessage, clientName);
-            if (clientMessage.equals("/end")) {
+            if (clientMessage.startsWith("/auth")) {
+                authentication(clientMessage);
+            }
+            else if (clientMessage.equals("/end")) {
                 return;
             }
-            myServer.broadcastMessage(clientName + ": " + clientMessage);
+            else {
+                myServer.broadcastMessage(clientName + ": " + clientMessage);
+            }
         }
     }
 
@@ -61,14 +66,20 @@ public class ClientHandler {
         }
     }
 
-    private void authentication() throws IOException {
-        String clientMessage = in.readUTF();
-        if (clientMessage.startsWith("/auth")) {
+    private void authentication(String clientMessage) throws IOException {
+        String nick;
+        do {
             String[] loginAndPasswords = clientMessage.split("\\s+");
-            String login = loginAndPasswords[0];
-            String password = loginAndPasswords[1];
 
-            String nick = myServer.getAuthService().getNickByLoginPass(login, password);
+            if (loginAndPasswords.length < 3) {
+                sendMessage("At least one of the fields is empty");
+                return;
+            }
+
+            String login = loginAndPasswords[1];
+            String password = loginAndPasswords[2];
+
+            nick = myServer.getAuthService().getNickByLoginPass(login, password);
             if (nick == null) {
                 sendMessage("Incorrect login and password");
                 return;
@@ -80,11 +91,12 @@ public class ClientHandler {
 
             sendMessage("/authok" + nick);
             clientName = nick;
-            myServer.broadcastMessage(clientName + "is online");
+            myServer.broadcastMessage(clientName + " is online");
             myServer.subscribe(this);
 
-        }
+        } while (nick == null);
     }
+
 
     public void sendMessage(String message) {
         try {
@@ -96,7 +108,7 @@ public class ClientHandler {
     }
 
 
-    public String getClientNameName() {
+    public String getClientName() {
         return clientName;
     }
 

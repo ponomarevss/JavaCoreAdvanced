@@ -23,10 +23,10 @@ public class MyServer {
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
             authService.start();
             while (true) {
-                System.out.println("Awaiting client connection...");
+                System.out.println("Awaiting client connection ...");
                 Socket socket = serverSocket.accept();
+                ClientHandler clientHandler = new ClientHandler(socket, this);
                 System.out.println("Client has connected");
-                new ClientHandler(socket, this);
             }
 
         } catch (IOException e) {
@@ -51,7 +51,7 @@ public class MyServer {
 
     public synchronized boolean isNickBusy(String nick) {
         for (ClientHandler client : clients) {
-            if (client.getClientNameName().equals(nick)) {
+            if (client.getClientName().equals(nick)) {
                 return true;
             }
         }
@@ -62,5 +62,6 @@ public class MyServer {
         for (ClientHandler client : clients) {
             client.sendMessage(message);
         }
+        System.out.println(message);
     }
 }
