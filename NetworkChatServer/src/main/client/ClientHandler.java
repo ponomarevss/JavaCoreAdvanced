@@ -46,6 +46,9 @@ public class ClientHandler {
             if (clientMessage.startsWith("/auth")) {
                 authentication(clientMessage);
             }
+            else if (clientMessage.startsWith("/w")) {
+                myServer.privateMessage(clientName + " " + clientMessage);
+            }
             else if (clientMessage.equals("/end")) {
                 return;
             }

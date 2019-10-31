@@ -64,4 +64,32 @@ public class MyServer {
         }
         System.out.println(message);
     }
+
+    public void privateMessage(String message) {
+        String[] nicksAndMessage = message.split("\\s++", 4);
+        String senderNick;
+        String receiverNick;
+        String privateMessage;
+        if (nicksAndMessage.length == 4) {
+            senderNick = nicksAndMessage[0];
+            receiverNick = nicksAndMessage[2];
+            privateMessage = nicksAndMessage[3];
+        }
+        else {
+            return;
+        }
+        ClientHandler sender = null;
+        ClientHandler receiver = null;
+        for (ClientHandler client : clients) {
+            if (client.getClientName().equals(senderNick)) {
+                sender = client;
+                client.sendMessage("to " + receiverNick + ": " + privateMessage);
+            }
+            else if (client.getClientName().equals(receiverNick)) {
+                receiver = client;
+                client.sendMessage("from " + senderNick + ": " + privateMessage);
+            }
+        }
+        if (receiver == null) sender.sendMessage("Failed to send private message to " + receiverNick);
+    }
 }
